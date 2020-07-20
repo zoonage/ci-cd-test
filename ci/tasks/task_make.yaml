@@ -5,6 +5,8 @@ image_resource:
   source:
     repository: quay.io/ometria/ometria.docker.platform
     tag: latest
+    username: ((quay-io-username))
+    password: ((quay-io-password))
 inputs:
   - name: git_repo
 params:
