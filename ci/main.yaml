@@ -45,6 +45,7 @@ jobs:
       # Download the git repository as we throw away everything from the previous step
       - get: git_repo
         # Only run if the run-unit-tests step passed
+        trigger: yes
         passed:
           - run-unit-tests
       # Use make deploy to deploy to staging.
