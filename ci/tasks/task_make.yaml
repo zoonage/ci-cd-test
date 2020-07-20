@@ -16,8 +16,4 @@ run:
   path: bash
   args:
     - -ec
-    - |
-      echo "Install dev dependencies"
-      make dep-deb
-      echo "Running ${MAKEFILE_TARGET} tests"
-      make "$MAKEFILE_TARGET"
+    - make "$MAKEFILE_TARGET"
