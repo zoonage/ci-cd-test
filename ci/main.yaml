@@ -1,0 +1,68 @@
+---
+# Define the types of resource are are going to use.
+# In this scenario we are going to use one pointed at 
+# the master branch of a git repository. This resource
+# is built into Concourse.
+
+# A list of resources can be found here https://resource-types.concourse-ci.org/.
+# resource_types:
+# This is the resource we use for triggering builds on pull requests.
+# - name: pull-request
+#   type: docker-image
+#   source:
+#     repository: teliaoss/github-pr-resource
+# If we wanted to we could also use other resources, such as this RSS feed.
+# - name: rss
+#   type: docker-image
+#   source:
+#     repository: suhlig/concourse-rss-resource
+#     tag: latest
+
+# We specify which git repository to use
+# Check https://github.com/zoonage/ci-cd-test for new changes on the master branch
+resources:
+  - name: git_repo
+    type: git
+    source:
+      uri: https://github.com/zoonage/ci-cd-test
+      branch: master
+
+jobs:
+  # Run our unit tests
+  - name: run-unit-tests
+    plan:
+      # Download the git repository
+      - get: git_repo
+        trigger: true
+      # Run the `unittest` makefile target
+      - task: run-unit
+        params:
+          MAKEFILE_TARGET: unittest
+        file: git_repo/tasks/run_make.yaml
+  # Deploy to staging
+  - name: deploy-staging
+    plan:
+      # Download the git repository as we throw away everything from the previous step
+      - get: git_repo
+        # Only run if the run-unit-tests step passed
+        passed:
+          - run-unit-tests
+      # Use make deploy to deploy to staging.
+      # If we were deploying to a real environment then we would use
+      # AWS secrets inside environment variables to enable access
+      - task: deploy-staging
+        params:
+          MAKEFILE_TARGET: deploy
+          ENVIRONMENT: staging
+        file: git_repo/tasks/run_make.yaml
+      # Repeat for production
+  - name: deploy-prod
+    plan:
+      - get: git_repo
+        passed:
+          - deploy-staging
+      - task: deploy-prod
+        params:
+          MAKEFILE_TARGET: deploy
+          ENVIRONMENT: production
+        file: git_repo/tasks/run_make.yaml

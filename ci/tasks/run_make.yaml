@@ -1,0 +1,20 @@
+---
+platform: linux
+image_resource:
+  type: "docker-image"
+  source:
+    : quay.io/ometria/ometria.docker.platform
+inputs:
+  - name: git_repo
+params:
+  MAKEFILE_TARGET: unit-test
+run:
+  dir: git_repo
+  path: bash
+  args:
+    - -ec
+    - |
+      echo "Install dev dependencies"
+      make dep-deb
+      echo "Running ${MAKEFILE_TARGET} tests"
+      make "$MAKEFILE_TARGET"
