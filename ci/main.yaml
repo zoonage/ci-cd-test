@@ -38,7 +38,7 @@ jobs:
       - task: run-unit
         params:
           MAKEFILE_TARGET: unittest
-        file: git_repo/tasks/run_make.yaml
+        file: git_repo/ci/tasks/run_make.yaml
   # Deploy to staging
   - name: deploy-staging
     plan:
@@ -54,7 +54,7 @@ jobs:
         params:
           MAKEFILE_TARGET: deploy
           ENVIRONMENT: staging
-        file: git_repo/tasks/run_make.yaml
+        file: git_repo/ci/tasks/run_make.yaml
       # Repeat for production
   - name: deploy-prod
     plan:
@@ -65,4 +65,4 @@ jobs:
         params:
           MAKEFILE_TARGET: deploy
           ENVIRONMENT: production
-        file: git_repo/tasks/run_make.yaml
+        file: git_repo/ci/tasks/run_make.yaml
